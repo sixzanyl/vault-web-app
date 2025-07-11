@@ -1,5 +1,12 @@
-const tg = window.Telegram.WebApp;
-tg.expand();
+const tg = window.Telegram?.WebApp;
+if (tg) {
+  tg.expand();
+  const user = tg.initDataUnsafe?.user;
+  if (user) {
+    document.getElementById("username").textContent = user.first_name;
+  }
+}
+
 
 function showTab(id) {
   document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
