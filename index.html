@@ -2,37 +2,139 @@
 <html>
 <head>
   <title>ForexIntel Vault</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <style>
-    body { font-family: sans-serif; background: #111; color: #fff; padding: 20px; }
-    h1 { color: #00ffae; }
-    .card { background: #222; padding: 15px; margin: 10px 0; border-radius: 10px; }
+    body {
+      background: #0c0f16;
+      color: #ffffff;
+      font-family: 'Segoe UI', sans-serif;
+      padding: 0;
+      margin: 0;
+    }
+    header {
+      background: #00ffc8;
+      color: #000;
+      padding: 20px;
+      text-align: center;
+    }
+    .container {
+      max-width: 800px;
+      margin: auto;
+      padding: 20px;
+    }
+    .section {
+      margin-bottom: 40px;
+    }
+    .section h2 {
+      border-bottom: 2px solid #00ffc8;
+      padding-bottom: 10px;
+    }
+    .card {
+      background: #1b1f2b;
+      padding: 15px;
+      border-radius: 8px;
+      margin: 10px 0;
+    }
+    .card strong {
+      color: #00ffc8;
+    }
+    button {
+      background: #00ffc8;
+      border: none;
+      color: #000;
+      padding: 10px 20px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    #ai-box {
+      background: #11151c;
+      padding: 15px;
+      border-radius: 8px;
+    }
+    #ai-response {
+      margin-top: 10px;
+      white-space: pre-wrap;
+    }
   </style>
 </head>
 <body>
-  <h1>📢 Signals</h1>
-  <div id="signals"></div>
+  <header>
+    <h1>🧠 ForexIntel Vault</h1>
+    <p>Premium Signals • Charts • AI • Strategies</p>
+  </header>
 
-  <h1>📊 Charts</h1>
-  <div id="charts"></div>
+  <div class="container">
+
+    <div class="section" id="signals">
+      <h2>📈 Latest Signals</h2>
+      <div id="signals-list"></div>
+    </div>
+
+    <div class="section" id="charts">
+      <h2>📊 Chart Vault</h2>
+      <div id="charts-list"></div>
+    </div>
+
+    <div class="section" id="ai">
+      <h2>🧠 FX GPT Assistant</h2>
+      <div id="ai-box">
+        <input type="text" id="question" placeholder="Ask anything about forex..." style="width: 90%; padding: 10px; border-radius: 5px;" />
+        <button onclick="askGPT()">Ask</button>
+        <div id="ai-response"></div>
+      </div>
+    </div>
+
+    <div class="section" id="resources">
+      <h2>📚 Resources</h2>
+      <ul>
+        <li><a href="https://example.com/guide1.pdf" target="_blank">📘 Trading Basics PDF</a></li>
+        <li><a href="https://example.com/video1" target="_blank">🎥 Strategy Masterclass</a></li>
+        <li><a href="https://example.com/ebook" target="_blank">📖 Advanced Price Action</a></li>
+      </ul>
+    </div>
+
+  </div>
 
   <script>
-    fetch("http://localhost:5000/api/signals")
+    // Load Signals
+    fetch("https://forexintel-server.onrender.com/api/signals")
       .then(res => res.json())
       .then(data => {
-        const box = document.getElementById("signals");
+        const box = document.getElementById("signals-list");
         data.forEach(item => {
-          box.innerHTML += `<div class="card"><b>${item.time}</b><br>${item.content}</div>`;
+          box.innerHTML += `<div class="card"><strong>${item.time}</strong><br>${item.content}</div>`;
         });
       });
 
-    fetch("http://localhost:5000/api/charts")
+    // Load Charts
+    fetch("https://forexintel-server.onrender.com/api/charts")
       .then(res => res.json())
       .then(data => {
-        const box = document.getElementById("charts");
+        const box = document.getElementById("charts-list");
         data.forEach(item => {
-          box.innerHTML += `<div class="card"><b>${item.time}</b><br>${item.content}</div>`;
+          box.innerHTML += `<div class="card"><strong>${item.time}</strong><br>${item.content}</div>`;
         });
       });
+
+    // Ask AI
+    function askGPT() {
+      const q = document.getElementById("question").value;
+      const resBox = document.getElementById("ai-response");
+      resBox.textContent = "Typing...";
+
+      fetch("https://forexintel-server.onrender.com/api/ai", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({ question: q })
+      })
+      .then(res => res.json())
+      .then(data => {
+        resBox.textContent = data.answer;
+      })
+      .catch(() => resBox.textContent = "❌ GPT unavailable.");
+    }
   </script>
 </body>
 </html>
