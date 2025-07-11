@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>ForexIntel Vault</title>
+  <style>
+    body { font-family: sans-serif; background: #111; color: #fff; padding: 20px; }
+    h1 { color: #00ffae; }
+    .card { background: #222; padding: 15px; margin: 10px 0; border-radius: 10px; }
+  </style>
+</head>
+<body>
+  <h1>📢 Signals</h1>
+  <div id="signals"></div>
+
+  <h1>📊 Charts</h1>
+  <div id="charts"></div>
+
+  <script>
+    fetch("http://localhost:5000/api/signals")
+      .then(res => res.json())
+      .then(data => {
+        const box = document.getElementById("signals");
+        data.forEach(item => {
+          box.innerHTML += `<div class="card"><b>${item.time}</b><br>${item.content}</div>`;
+        });
+      });
+
+    fetch("http://localhost:5000/api/charts")
+      .then(res => res.json())
+      .then(data => {
+        const box = document.getElementById("charts");
+        data.forEach(item => {
+          box.innerHTML += `<div class="card"><b>${item.time}</b><br>${item.content}</div>`;
+        });
+      });
+  </script>
+</body>
+</html>
