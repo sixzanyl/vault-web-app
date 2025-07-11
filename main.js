@@ -16,7 +16,7 @@ function showTab(id) {
 }
 
 // Fetch Signals
-fetch("http://localhost:5000/api/signals")
+fetch("https://forexintel-api.onrender.com/api/signals")
   .then(res => res.json())
   .then(data => {
     const box = document.getElementById("signals");
@@ -30,7 +30,7 @@ fetch("http://localhost:5000/api/signals")
   });
 
 // Fetch Charts
-fetch("http://localhost:5000/api/charts")
+fetch("https://forexintel-api.onrender.com/api/charts")
   .then(res => res.json())
   .then(data => {
     const box = document.getElementById("charts");
