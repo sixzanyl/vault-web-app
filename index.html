@@ -9,132 +9,191 @@
       background: #0c0f16;
       color: #ffffff;
       font-family: 'Segoe UI', sans-serif;
-      padding: 0;
       margin: 0;
+      padding: 0;
     }
     header {
-      background: #00ffc8;
+      background: linear-gradient(135deg, #00ffc8, #00ffae);
       color: #000;
-      padding: 20px;
       text-align: center;
+      padding: 30px 15px;
+      box-shadow: 0 0 10px #00ffc8;
+    }
+    h1 {
+      margin: 0;
+      font-size: 26px;
     }
     .container {
-      max-width: 800px;
-      margin: auto;
       padding: 20px;
+      max-width: 900px;
+      margin: auto;
     }
     .section {
       margin-bottom: 40px;
     }
     .section h2 {
-      border-bottom: 2px solid #00ffc8;
-      padding-bottom: 10px;
+      border-left: 4px solid #00ffc8;
+      padding-left: 10px;
+      margin-bottom: 15px;
     }
     .card {
-      background: #1b1f2b;
+      background: rgba(255, 255, 255, 0.05);
       padding: 15px;
-      border-radius: 8px;
+      border-radius: 10px;
       margin: 10px 0;
+      border: 1px solid #00ffc81a;
     }
     .card strong {
       color: #00ffc8;
     }
+    input[type="text"] {
+      width: 80%;
+      padding: 10px;
+      border-radius: 5px;
+      border: none;
+      margin-bottom: 10px;
+      background: #1b1f2b;
+      color: #fff;
+    }
     button {
       background: #00ffc8;
-      border: none;
       color: #000;
+      font-weight: bold;
+      border: none;
       padding: 10px 20px;
       border-radius: 8px;
       cursor: pointer;
-      font-weight: bold;
+      margin-left: 10px;
     }
-    #ai-box {
-      background: #11151c;
-      padding: 15px;
-      border-radius: 8px;
+    button:hover {
+      background: #00c09e;
     }
     #ai-response {
+      background: #11151c;
       margin-top: 10px;
+      padding: 15px;
+      border-radius: 8px;
+      min-height: 60px;
       white-space: pre-wrap;
+    }
+    .resources a {
+      color: #00ffc8;
+      text-decoration: none;
+    }
+    .resources a:hover {
+      text-decoration: underline;
+    }
+    .last-updated {
+      font-size: 12px;
+      color: #888;
+      margin-top: -10px;
+      margin-bottom: 20px;
     }
   </style>
 </head>
 <body>
-  <header>
-    <h1>🧠 ForexIntel Vault</h1>
-    <p>Premium Signals • Charts • AI • Strategies</p>
-  </header>
 
-  <div class="container">
+<header>
+  <h1>🧠 ForexIntel Vault</h1>
+  <p>Premium Signals • Live Charts • AI Assistant • Strategy Hub</p>
+</header>
 
-    <div class="section" id="signals">
-      <h2>📈 Latest Signals</h2>
-      <div id="signals-list"></div>
-    </div>
+<div class="container">
 
-    <div class="section" id="charts">
-      <h2>📊 Chart Vault</h2>
-      <div id="charts-list"></div>
-    </div>
-
-    <div class="section" id="ai">
-      <h2>🧠 FX GPT Assistant</h2>
-      <div id="ai-box">
-        <input type="text" id="question" placeholder="Ask anything about forex..." style="width: 90%; padding: 10px; border-radius: 5px;" />
-        <button onclick="askGPT()">Ask</button>
-        <div id="ai-response"></div>
-      </div>
-    </div>
-
-    <div class="section" id="resources">
-      <h2>📚 Resources</h2>
-      <ul>
-        <li><a href="https://example.com/guide1.pdf" target="_blank">📘 Trading Basics PDF</a></li>
-        <li><a href="https://example.com/video1" target="_blank">🎥 Strategy Masterclass</a></li>
-        <li><a href="https://example.com/ebook" target="_blank">📖 Advanced Price Action</a></li>
-      </ul>
-    </div>
-
+  <div class="section">
+    <h2>📈 Latest Signals</h2>
+    <div class="last-updated" id="signal-updated">Loading...</div>
+    <div id="signals-list"></div>
   </div>
 
-  <script>
-    // Load Signals
-    fetch("https://forexintel-server.onrender.com/api/signals")
-      .then(res => res.json())
-      .then(data => {
-        const box = document.getElementById("signals-list");
-        data.forEach(item => {
-          box.innerHTML += `<div class="card"><strong>${item.time}</strong><br>${item.content}</div>`;
-        });
+  <div class="section">
+    <h2>📊 Chart Vault</h2>
+    <div class="last-updated" id="chart-updated">Loading...</div>
+    <div id="charts-list"></div>
+  </div>
+
+  <div class="section">
+    <h2>🧠 FX GPT Assistant</h2>
+    <input type="text" id="question" placeholder="Ask about forex, strategies, or charts..." />
+    <button onclick="askGPT()">Ask</button>
+    <div id="ai-response">Awaiting input...</div>
+  </div>
+
+  <div class="section resources">
+    <h2>📚 Premium Resources</h2>
+    <div class="card"><a href="https://example.com/guide1.pdf" target="_blank">📘 Trading Basics PDF</a></div>
+    <div class="card"><a href="https://example.com/video1" target="_blank">🎥 Strategy Masterclass</a></div>
+    <div class="card"><a href="https://example.com/ebook" target="_blank">📖 Advanced Price Action eBook</a></div>
+  </div>
+
+</div>
+
+<script>
+  // Live Signals
+  fetch("https://forexintel-server.onrender.com/api/signals")
+    .then(res => res.json())
+    .then(data => {
+      const box = document.getElementById("signals-list");
+      const updated = document.getElementById("signal-updated");
+      updated.textContent = "Updated: " + (data[0]?.time || "—");
+
+      data.forEach(item => {
+        box.innerHTML += `
+          <div class="card">
+            <strong>${item.time}</strong><br>
+            ${item.content}
+          </div>`;
       });
+    })
+    .catch(() => {
+      document.getElementById("signals-list").innerHTML = "❌ Unable to load signals.";
+    });
 
-    // Load Charts
-    fetch("https://forexintel-server.onrender.com/api/charts")
-      .then(res => res.json())
-      .then(data => {
-        const box = document.getElementById("charts-list");
-        data.forEach(item => {
-          box.innerHTML += `<div class="card"><strong>${item.time}</strong><br>${item.content}</div>`;
-        });
+  // Chart Vault
+  fetch("https://forexintel-server.onrender.com/api/charts")
+    .then(res => res.json())
+    .then(data => {
+      const box = document.getElementById("charts-list");
+      const updated = document.getElementById("chart-updated");
+      updated.textContent = "Updated: " + (data[0]?.time || "—");
+
+      data.forEach(item => {
+        box.innerHTML += `
+          <div class="card">
+            <strong>${item.time}</strong><br>
+            ${item.content}
+          </div>`;
       });
+    })
+    .catch(() => {
+      document.getElementById("charts-list").innerHTML = "❌ Unable to load charts.";
+    });
 
-    // Ask AI
-    function askGPT() {
-      const q = document.getElementById("question").value;
-      const resBox = document.getElementById("ai-response");
-      resBox.textContent = "Typing...";
-
-      fetch("https://forexintel-server.onrender.com/api/ai", {
-        method: "POST",
-        headers: {"Content-Type": "application/json"},
-        body: JSON.stringify({ question: q })
-      })
-      .then(res => res.json())
-      .then(data => {
-        resBox.textContent = data.answer;
-      })
-      .catch(() => resBox.textContent = "❌ GPT unavailable.");
+  // Ask GPT
+  function askGPT() {
+    const q = document.getElementById("question").value.trim();
+    const resBox = document.getElementById("ai-response");
+    if (!q) {
+      resBox.textContent = "❗ Please enter a question.";
+      return;
     }
-  </script>
+
+    resBox.textContent = "Typing...";
+
+    fetch("https://forexintel-server.onrender.com/api/ai", {
+      method: "POST",
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify({ question: q })
+    })
+    .then(res => res.json())
+    .then(data => {
+      resBox.textContent = data.answer || "❌ No response from GPT.";
+    })
+    .catch(() => {
+      resBox.textContent = "❌ GPT Assistant is unavailable.";
+    });
+  }
+</script>
+
 </body>
 </html>
