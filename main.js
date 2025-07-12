@@ -6,21 +6,27 @@ if (tg) {
   currentUser = tg.initDataUnsafe?.user;
 }
 
-// 🔐 Gatekeeper logic
+const ADMIN_USERNAME = "sixzanil";  // your Telegram @username
+
 if (currentUser?.username) {
-  fetch(`https://forexintel-api.onrender.com/api/verify/${currentUser.username}`)
-    .then(res => res.json())
-    .then(data => {
-      if (data.status === "approved") {
-        initVault(); // user allowed in
-      } else {
-        denyAccess();
-      }
-    })
-    .catch(() => denyAccess());
+  if (currentUser.username.toLowerCase() === ADMIN_USERNAME.toLowerCase()) {
+    initVault(); // always allow admin
+  } else {
+    fetch(`https://forexintel-api.onrender.com/api/verify/${currentUser.username}`)
+      .then(res => res.json())
+      .then(data => {
+        if (data.status === "approved") {
+          initVault();
+        } else {
+          denyAccess();
+        }
+      })
+      .catch(() => denyAccess());
+  }
 } else {
   denyAccess();
 }
+
 
 // ⛔ Deny entry if not allowed
 function denyAccess() {
