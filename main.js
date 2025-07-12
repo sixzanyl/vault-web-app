@@ -1,21 +1,63 @@
 const tg = window.Telegram?.WebApp;
+let currentUser = null;
+
 if (tg) {
   tg.expand();
-  const user = tg.initDataUnsafe?.user;
-  if (user && document.getElementById("username")) {
-    document.getElementById("username").textContent = user.first_name;
+  currentUser = tg.initDataUnsafe?.user;
+}
+
+// 🔐 Gatekeeper logic
+if (currentUser?.username) {
+  fetch(`https://forexintel-api.onrender.com/api/verify/${currentUser.username}`)
+    .then(res => res.json())
+    .then(data => {
+      if (data.status === "approved") {
+        initVault(); // user allowed in
+      } else {
+        denyAccess();
+      }
+    })
+    .catch(() => denyAccess());
+} else {
+  denyAccess();
+}
+
+// ⛔ Deny entry if not allowed
+function denyAccess() {
+  document.body.innerHTML = `
+    <div style="padding: 30px; text-align: center; font-size: 18px; color: #f55;">
+      ⛔ You are not authorized to access this vault.<br><br>
+      Please <a href="https://t.me/Sixzanil" style="color: #00ffae;">contact admin</a> for access.
+    </div>
+  `;
+}
+
+// ✅ Unlock full vault
+function initVault() {
+  if (currentUser && document.getElementById("username")) {
+    document.getElementById("username").textContent = currentUser.first_name;
   }
+
+  // Safe tab switching
+  window.showTab = function (id) {
+    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+    document.querySelectorAll('.tab-button').forEach(b => b.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    event.currentTarget.classList.add('active');
+  };
+
+  // 🔁 Load vault data
+  loadVaultContent();
 }
 
-// Safe tab switching
-function showTab(id) {
-  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-  document.querySelectorAll('.tab-button').forEach(b => b.classList.remove('active'));
-  document.getElementById(id).classList.add('active');
-  event.currentTarget.classList.add('active');
+// ♻️ Main vault loader
+function loadVaultContent() {
+  fetchSection("signals", "signals", "Signal", "📢", renderSignalOrChart);
+  fetchSection("charts", "charts", "Chart", "📊", renderSignalOrChart);
+  fetchSection("resources", "resources", "Resource", "", renderResource);
 }
 
-// 🔁 Fetch section content with loading/empty/fail states
+// 🔁 Section loader
 function fetchSection(endpoint, containerId, itemLabel, emoji, formatterFn) {
   const box = document.getElementById(containerId);
   const loading = box.querySelector(".loading");
@@ -29,7 +71,6 @@ function fetchSection(endpoint, containerId, itemLabel, emoji, formatterFn) {
         empty.style.display = "block";
         return;
       }
-
       data.forEach(item => {
         box.innerHTML += formatterFn(item, emoji, itemLabel);
       });
@@ -41,7 +82,7 @@ function fetchSection(endpoint, containerId, itemLabel, emoji, formatterFn) {
     });
 }
 
-// Custom render functions
+// 🎨 Renderers
 const renderSignalOrChart = (item, emoji, label) => `
   <div class="card">
     <h3>${emoji} ${label} - ${item.time}</h3>
@@ -56,9 +97,3 @@ const renderResource = (item) => `
     <p><a href="${item.link}" target="_blank" style="color: #00ffae;">Access</a></p>
   </div>
 `;
-
-
-// Load each section
-fetchSection("signals", "signals", "Signal", "📢", renderSignalOrChart);
-fetchSection("charts", "charts", "Chart", "📊", renderSignalOrChart);
-fetchSection("resources", "resources", "Resource", "", renderResource);
