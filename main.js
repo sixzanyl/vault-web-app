@@ -15,45 +15,49 @@ function showTab(id) {
   event.currentTarget.classList.add('active');
 }
 
-// Fetch Signals
-fetch("https://forexintel-api.onrender.com/api/signals")
-  .then(res => res.json())
-  .then(data => {
-    const box = document.getElementById("signals");
-    data.forEach(item => {
-      box.innerHTML += `
-        <div class="card">
-          <h3>📢 Signal - ${item.time}</h3>
-          <p>${item.content}</p>
-        </div>`;
-    });
-  });
+// 🔁 Fetch section content with loading/empty/fail states
+function fetchSection(endpoint, containerId, itemLabel, emoji, formatterFn) {
+  const box = document.getElementById(containerId);
+  const loading = box.querySelector(".loading");
+  const empty = box.querySelector(".empty");
 
-// Fetch Charts
-fetch("https://forexintel-api.onrender.com/api/charts")
-  .then(res => res.json())
-  .then(data => {
-    const box = document.getElementById("charts");
-    data.forEach(item => {
-      box.innerHTML += `
-        <div class="card">
-          <h3>📊 Chart - ${item.time}</h3>
-          <p>${item.content}</p>
-        </div>`;
-    });
-  });
+  fetch(`https://forexintel-api.onrender.com/api/${endpoint}`)
+    .then(res => res.json())
+    .then(data => {
+      loading.style.display = "none";
+      if (!data || data.length === 0) {
+        empty.style.display = "block";
+        return;
+      }
 
-// 🔥 Fetch Resources (New)
-fetch("https://forexintel-api.onrender.com/api/resources")
-  .then(res => res.json())
-  .then(data => {
-    const box = document.getElementById("resources");
-    data.forEach(item => {
-      box.innerHTML += `
-        <div class="card">
-          <h3>${item.icon} ${item.title}</h3>
-          <p>${item.desc}</p>
-          <p><a href="${item.link}" target="_blank" style="color: #00ffae;">Access</a></p>
-        </div>`;
+      data.forEach(item => {
+        box.innerHTML += formatterFn(item, emoji, itemLabel);
+      });
+    })
+    .catch(() => {
+      loading.style.display = "none";
+      empty.textContent = `❌ Failed to load ${itemLabel.toLowerCase()}s.`;
+      empty.style.display = "block";
     });
-  });
+}
+
+// Custom render functions
+const renderSignalOrChart = (item, emoji, label) => `
+  <div class="card">
+    <h3>${emoji} ${label} - ${item.time}</h3>
+    <p>${item.content}</p>
+  </div>
+`;
+
+const renderResource = (item) => `
+  <div class="card">
+    <h3>${item.icon} ${item.title}</h3>
+    <p>${item.desc}</p>
+    <p><a href="${item.link}" target="_blank" style="color: #00ffae;">Access</a></p>
+  </div>
+`;
+
+// Load each section
+fetchSection("signals", "signals", "Signal", "📢", renderSignalOrChart);
+fetchSection("charts", "charts", "Chart", "📊", renderSignalOrChart);
+fetchSection("resources", "resources", "Resource", "", renderResource);

@@ -67,3 +67,9 @@ header {
   font-size: 14px;
   color: #ccc;
 }
+.loading, .empty {
+  text-align: center;
+  padding: 20px;
+  color: #888;
+  font-size: 14px;
+}
