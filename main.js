@@ -57,6 +57,7 @@ const renderResource = (item) => `
   </div>
 `;
 
+
 // Load each section
 fetchSection("signals", "signals", "Signal", "📢", renderSignalOrChart);
 fetchSection("charts", "charts", "Chart", "📊", renderSignalOrChart);
